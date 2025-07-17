@@ -4,18 +4,23 @@ import React, { useState } from "react";
 const ResumeForm = ({ onChange }) => {
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
     phone: "",
-    education: "",
-    experience: "",
+    email: "",
+    Location:"",
+    Summary:"",
     skills: "",
+    education: "",
+    Projects:"",
+    experience: "",
+    certifications:"",
+ 
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     const updatedFormData = { ...formData, [name]: value };
     setFormData(updatedFormData);
-    onChange(updatedFormData); // Send to parent for live preview
+    onChange(updatedFormData); 
   };
 
   return (
