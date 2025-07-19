@@ -1,82 +1,102 @@
-import React, { useState } from "react";
-import ResumeForm from "./components/ResumeForm";
+import React from "react";
 
-const App = () => {
-  const [resumeData, setResumeData] = useState({});
+const ResumePreview = ({ formValues }) => {
+  if (!formValues) return null;
 
-  const handleFormChange = (newData) => {
-    setResumeData((prevData) => ({
-      ...prevData,
-      ...newData,
-    }));
-  };
+  const {
+    header = {},
+    summary = "",
+    branch = "",
+    skills = [],
+    education = [],
+    experience = "" // ✅ New field added
+  } = formValues;
 
   return (
-    <div className="p-6 min-h-screen bg-gray-50">
-      <div className="flex flex-col md:flex-row gap-6">
-        {/* Left: Form */}
-        <div className="md:w-1/2 w-full">
-          <ResumeForm onChange={handleFormChange} />
-        </div>
-
-        {/* Right: Preview */}
-        <div className="md:w-1/2 w-full p-4 bg-white rounded shadow-md">
-          {/* Header */}
-          <h2 className="text-2xl font-bold mb-2">{resumeData?.header?.name}</h2>
-          <p className="text-sm text-gray-600 mb-1">
-            {resumeData?.header?.phone} | {resumeData?.header?.email}
+    <div className="p-6 border rounded-lg bg-white shadow-md w-full">
+      {/* Header Info */}
+      {(header.name || header.email || header.phone || header.location) && (
+        <div className="mb-4">
+          {header.name && <h1 className="text-2xl font-bold">{header.name}</h1>}
+          <p className="text-gray-600">
+            {[header.email, header.phone, header.location].filter(Boolean).join(" | ")}
           </p>
-          <p className="text-sm text-gray-600 mb-2">{resumeData?.header?.location}</p>
-          <p className="text-sm text-blue-600 mb-4">
-            <a href={resumeData?.header?.linkedin} target="_blank" rel="noreferrer">LinkedIn</a>{" "}|
-            <a href={resumeData?.header?.github} target="_blank" rel="noreferrer" className="ml-1">GitHub</a>
+          <p className="text-gray-600">
+            {header.linkedin && (
+              <a
+                href={header.linkedin}
+                target="_blank"
+                rel="noreferrer"
+                className="mr-2 text-blue-600 underline"
+              >
+                LinkedIn
+              </a>
+            )}
+            {header.github && (
+              <a
+                href={header.github}
+                target="_blank"
+                rel="noreferrer"
+                className="text-blue-600 underline"
+              >
+                GitHub
+              </a>
+            )}
           </p>
-
-          {/* Summary */}
-          {resumeData.summary && (
-            <div className="mt-4">
-              <h3 className="text-lg font-semibold">Summary</h3>
-              <p>{resumeData.summary}</p>
-            </div>
-          )}
-
-          {/* Education */}
-          {resumeData.education && (
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold mb-2">Education</h3>
-              <ul className="text-sm list-disc pl-5 space-y-1">
-                <li><strong>Class 10:</strong> {resumeData.education.class10.school} ({resumeData.education.class10.percentage}%)</li>
-                <li><strong>Class 12:</strong> {resumeData.education.class12.school} ({resumeData.education.class12.percentage}%)</li>
-                <li><strong>College:</strong> {resumeData.education.college.name} (CPI: {resumeData.education.college.cpi})</li>
-              </ul>
-            </div>
-          )}
-
-          {/* Skills */}
-          {resumeData.branch === "it" || resumeData.branch === "core" ? (
-            resumeData.technicalSkills && (
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold mb-2">Technical Skills</h3>
-                <ul className="text-sm list-disc pl-5 space-y-1">
-                  <li><strong>Programming Languages:</strong> {resumeData.technicalSkills.programmingLanguages}</li>
-                  <li><strong>Web Technologies:</strong> {resumeData.technicalSkills.webTechnologies}</li>
-                  <li><strong>Tools:</strong> {resumeData.technicalSkills.tools}</li>
-                  <li><strong>Databases:</strong> {resumeData.technicalSkills.databases}</li>
-                </ul>
-              </div>
-            )
-          ) : resumeData.branch === "non-tech" ? (
-            resumeData.generalSkills && (
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold mb-2">General Skills</h3>
-                <p className="text-sm">{resumeData.generalSkills}</p>
-              </div>
-            )
-          ) : null}
         </div>
-      </div>
+      )}
+
+      {/* Branch Section */}
+      {branch && (
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold">Branch</h2>
+          <p>{branch}</p>
+        </div>
+      )}
+
+      {/* Summary Section */}
+      {summary && (
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold">Summary</h2>
+          <p>{summary}</p>
+        </div>
+      )}
+
+      {/* Skills Section */}
+      {Array.isArray(skills) && skills.length > 0 && (
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold">Skills</h2>
+          <ul className="list-disc list-inside">
+            {skills.map((skill, index) => (
+              <li key={index}>{skill}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* ✅ Professional Experience Section */}
+      {experience && (
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold">Professional Experience</h2>
+          <p>{experience}</p>
+        </div>
+      )}
+
+      {/* Education Section */}
+      {Array.isArray(education) && education.length > 0 && (
+        <div>
+          <h2 className="text-lg font-semibold">Education</h2>
+          {education.map((edu, index) => (
+            <div key={index} className="mb-2">
+              <p className="font-medium">{edu.degree}</p>
+              <p className="text-sm text-gray-600">{edu.institution}</p>
+              <p className="text-sm text-gray-600">{edu.year}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
-export default App;
+export default ResumePreview;
