@@ -2,17 +2,16 @@ import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
-
-import React from "react";
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import ResumeForm from "./components/ResumeForm";
 
-// 🔐 ProtectedRoute Component
+
+// 🔐 ProtectedRoute
 const ProtectedRoute = ({ isAuthenticated, children }) => {
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
 
-// 🔐 Simple Login Page
+// 🔐 Login Page
 const LoginPage = ({ onLogin }) => {
   return (
     <div className="h-screen flex flex-col items-center justify-center bg-gray-100">
@@ -27,7 +26,7 @@ const LoginPage = ({ onLogin }) => {
   );
 };
 
-// 🔗 Resume Page with Logout Button
+// 🔗 Resume Page
 const ResumePage = ({ resumeData, handleFormChange }) => {
   const navigate = useNavigate();
 
@@ -47,14 +46,10 @@ const ResumePage = ({ resumeData, handleFormChange }) => {
           Logout
         </button>
       </div>
-
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Left: Form */}
         <div className="md:w-1/2 w-full">
           <ResumeForm onChange={handleFormChange} />
         </div>
-
-        {/* Right: Preview */}
         <div className="md:w-1/2 w-full p-4 bg-white rounded shadow-md break-words overflow-auto max-h-screen">
           <h2 className="text-2xl font-bold mb-2">{resumeData?.header?.name}</h2>
           <p className="text-sm text-gray-600 mb-1">
@@ -138,48 +133,65 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
     localStorage.getItem("isAuthenticated") === "true"
   );
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const [resumeData, setResumeData] = useState({
-    header: {
-      name: '',
-      phone: '',
-      email: '',
-      location: '',
-      linkedin: '',
-      github: '',
-    },
-    summary: '',
-    branch: '',
-    technicalSkills: {
-      programmingLanguages: '',
-      webTechnologies: '',
-      tools: '',
-      databases: '',
-    },
-    generalSkills: '',
-    education: {
-      class10: { school: '', percentage: '' },
-      class12: { school: '', percentage: '' },
-      college: { name: '', cpi: '' },
-    },
-    experienceSummary: '',
-  });
+const [resumeData, setResumeData] = useState(() => {
+  const saved = localStorage.getItem("resumeData");
+  return saved
+    ? JSON.parse(saved)
+    : {
+        header: {
+          name: '',
+          phone: '',
+          email: '',
+          location: '',
+          linkedin: '',
+          github: '',
+        },
+        summary: '',
+        branch: '',
+        technicalSkills: {
+          programmingLanguages: '',
+          webTechnologies: '',
+          tools: '',
+          databases: '',
+        },
+        generalSkills: '',
+        education: {
+          class10: { school: '', percentage: '' },
+          class12: { school: '', percentage: '' },
+          college: { name: '', cpi: '' },
+        },
+        experienceSummary: '',
+      };
+});
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setIsAuthenticated(true);
-        localStorage.setItem("isAuthenticated", "true");
-        console.log("✅ User logged in:", user.email);
-      } else {
-        setIsAuthenticated(false);
-        localStorage.removeItem("isAuthenticated");
-        console.log("🔴 User logged out");
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    if (user) {
+      setIsAuthenticated(true);
+      localStorage.setItem("isAuthenticated", "true");
+      if (window.location.pathname !== "/resume") {
+        navigate("/resume");
       }
-    });
+    } else {
+      setIsAuthenticated(false);
+      localStorage.removeItem("isAuthenticated");
+      if (window.location.pathname !== "/login") {
+        navigate("/login");
+      }
+    }
+  });
 
-    return () => unsubscribe();
-  }, []);
+  return () => unsubscribe();
+}, [navigate]);
+
+
+// ✅ Add this right below the auth useEffect
+useEffect(() => {
+  localStorage.setItem("resumeData", JSON.stringify(resumeData));
+}, [resumeData]);
 
   const handleFormChange = (newData) => {
     setResumeData((prevData) => ({
@@ -198,21 +210,19 @@ const App = () => {
   };
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to={isAuthenticated ? "/resume" : "/login"} />} />
-        <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
-        <Route
-          path="/resume"
-          element={
-            <ProtectedRoute isAuthenticated={isAuthenticated}>
-              <ResumePage resumeData={resumeData} handleFormChange={handleFormChange} />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="*" element={<p className="p-6">404 - Page Not Found</p>} />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Navigate to={isAuthenticated ? "/resume" : "/login"} />} />
+      <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+      <Route
+        path="/resume"
+        element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}>
+            <ResumePage resumeData={resumeData} handleFormChange={handleFormChange} />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="*" element={<p className="p-6">404 - Page Not Found</p>} />
+    </Routes>
   );
 };
 

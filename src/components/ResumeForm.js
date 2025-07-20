@@ -1,6 +1,6 @@
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 const ResumeForm = ({ onChange }) => {
   const [summary, setSummary] = useState("");
@@ -59,6 +59,7 @@ const ResumeForm = ({ onChange }) => {
     },
   });
 
+  const lastSent = useRef("");
   useEffect(() => {
     const fullData = {
       ...formik.values,
@@ -69,7 +70,11 @@ const ResumeForm = ({ onChange }) => {
       education,
       experienceSummary,
     };
+     const stringified = JSON.stringify(fullData);
+  if (stringified !== lastSent.current) {
+    lastSent.current = stringified;
     onChange(fullData);
+  }
   }, [formik.values, summary, branch, generalSkills, technicalSkills, education, experienceSummary, onChange]);
 
   const handleEducationChange = (e, section, field) => {
