@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* App shell tweaks */
+:root {
+  color-scheme: light;
+}
+html, body, #root { height: 100%; }
+
+/* Utility button/input styles */
+.input {
+  @apply w-full rounded-xl border bg-white px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500/40;
+}
+.btn {
+  @apply rounded-xl border px-3 py-2 text-sm hover:bg-gray-50;
+}
+.btn-primary {
+  @apply rounded-xl bg-blue-600 px-4 py-2 text-white font-medium hover:bg-blue-700;
+}
+.prose h3 { @apply text-base font-semibold mt-4 mb-2; }
