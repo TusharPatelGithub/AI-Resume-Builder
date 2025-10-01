@@ -1,20 +1,17 @@
 AI Resume Builder
 
-AI Resume Builder is a modern web application that helps users create professional resumes quickly. It provides an intuitive frontend with live preview and a secure backend with authentication and MongoDB integration.
+AI Resume Builder is a modern web application that helps users create professional resumes quickly. It provides an intuitive frontend with live preview and a secure backend with authentication and integration.
 
 🚀 Tech Stack
 
-Frontend: React.js, Vite, TailwindCSS, Redux Toolkit
+Frontend: HTML, Tailwind CSS, react
 
-Backend: Node.js, Express.js
+Database: SQL
 
-Database: MongoDB
-
-Other: JWT Authentication, Bcrypt Password Hashing
 
 📂 Features
 
-🔒 Secure Authentication (JWT + bcrypt)
+🔒 Secure Authentication
 
 🏠 User Dashboard for managing multiple resumes
 
