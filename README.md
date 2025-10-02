@@ -6,7 +6,7 @@ AI Resume Builder is a modern web application that helps users create profession
 
 Frontend: HTML, Tailwind CSS, react
 
-Database: SQL
+Database: Mongo db
 
 
 📂 Features
